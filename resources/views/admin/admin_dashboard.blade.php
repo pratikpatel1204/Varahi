@@ -30,7 +30,6 @@
                 <img src="{{ asset('admin/img/bg/welcome-bg-01.svg') }}" alt="img" class="welcome-bg-03">
             </div>
         </div>
-        <!-- /Welcome Wrap -->
-       <h1>Check</h1>
+        <!-- /Welcome Wrap -->    
     </div>
 @endsection
