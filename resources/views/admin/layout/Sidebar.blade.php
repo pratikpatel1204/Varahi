@@ -373,7 +373,7 @@
                             </li>
                         </ul>
                     </li>
-                @endcan                
+                @endcan
                 @can('Loan Management')
                     <li>
                         <ul class="m-0">
@@ -402,9 +402,45 @@
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.expense.reimbursement.list') }}" class="px-2">
+                                <a href="{{ route('admin.salary.Processing') }}" class="px-2">
                                     <i class="ti ti-cash"></i>
                                     <span>Process Salary</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+                @can('Category Master')
+                    <li>
+                        <ul class="m-0">
+                            <li>
+                                <a href="{{ route('admin.category.list') }}" class="px-2">
+                                    <i class="ti ti-list"></i>
+                                    <span>Category Master</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+                @can('Product Master')
+                    <li>
+                        <ul class="m-0">
+                            <li>
+                                <a href="{{ route('employee.product.list') }}" class="px-2">
+                                    <i class="ti ti-package"></i>
+                                    <span>Product Master</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
+                @can('Product Inquiry')
+                    <li>
+                        <ul class="m-0">
+                            <li>
+                                <a href="{{ route('employee.inquiry.list') }}" class="px-2">
+                                    <i class="ti ti-search"></i>
+                                    <span>Product Inquiry</span>
                                 </a>
                             </li>
                         </ul>

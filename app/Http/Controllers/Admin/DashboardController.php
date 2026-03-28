@@ -60,7 +60,10 @@ class DashboardController extends Controller
             $attendance = Attendance::where('user_id', $id)
                 ->whereDate('date', $today)
                 ->first();
-
+           
+            if (!$attendance) {
+                $attendance = Attendance::where('user_id', $id)->whereNull('punch_out')->latest('date')->first();
+            }
             $weekStart = Carbon::now()->startOfWeek();
             $weekEnd   = Carbon::now()->endOfWeek();
 

@@ -21,6 +21,7 @@ class AttendanceController extends Controller
         $user = auth()->user();
 
         $today = now()->toDateString();
+        $todayDate = Carbon::today();
 
         $attendance = Attendance::where('user_id', $user->id)->whereDate('date', $today)->first();
 
@@ -39,6 +40,8 @@ class AttendanceController extends Controller
             Attendance::create([
                 'user_id'   => $user->id,
                 'date'      => $today,
+                'year'      => $todayDate->year,
+                'month'     => $todayDate->format('F'),
                 'punch_in'  => $request->in_time ?? now()->format('H:i:s'),
                 'status'    => 'Pending',
                 'reporting_manager_id' => $user->reporting_manager ?? null,

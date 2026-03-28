@@ -10,7 +10,7 @@ class SalaryType extends Model
     
      public function employeeSalaries()
     {
-        return $this->hasMany(EmployeeSalary::class);
+        return $this->hasMany(EmployeeSalaryType::class);
     }
     public function employeeSalaryTypes()
 {

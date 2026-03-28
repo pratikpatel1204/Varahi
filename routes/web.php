@@ -5,6 +5,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\admin\AssetController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\admin\BloodGroupController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\DepartmentController;
@@ -15,12 +16,15 @@ use App\Http\Controllers\admin\EmployeeController;
 use App\Http\Controllers\admin\EmployerEsicController;
 use App\Http\Controllers\Admin\ExpenseReimbursementController;
 use App\Http\Controllers\admin\HolidayController;
+use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\admin\LeaveTypeController;
 use App\Http\Controllers\admin\LoanManagementController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\admin\PFController;
+use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\QualificationAreaController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SalaryProcessingController;
 use App\Http\Controllers\admin\SalaryTypeController;
 use App\Http\Controllers\admin\SubDepartmentController;
 use App\Http\Controllers\admin\WorkingDayController;
@@ -201,7 +205,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/create-salary/{id}', [EmployeeController::class, 'employees_create_salary'])->name('employees.create.salary');
             Route::post('/store-salary', [EmployeeController::class, 'employees_store_salary'])->name('employees.store.salary');
             Route::get('/edit-salary/{id}', [EmployeeController::class, 'employees_edit_salary'])->name('employees.edit.salary');
-            
+
             Route::get('/view/{id}', [EmployeeController::class, 'view'])->name('employees.view');
             Route::post('/profile-update', [EmployeeController::class, 'profile_update'])->name('employees.profile.update');
             Route::post('/basic-update', [EmployeeController::class, 'basic_update'])->name('employee.basic.update');
@@ -237,23 +241,43 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/ajax', [AssetController::class, 'assets_history_ajax'])->name('assets.history.ajax');
             Route::get('/return/{id}', [AssetController::class, 'assets_return'])->name('assets.return');
         });
-        
+
         Route::prefix('loan')->middleware(['permission:Loan Management'])->group(function () {
             Route::get('/create', [LoanManagementController::class, 'loans_create'])->name('loans.create');
-            Route::post('/store', [LoanManagementController::class, 'loans_store'])->name('loans.store');                 
-            Route::get('/request', [LoanManagementController::class, 'loans_request'])->name('loan.request');                       
-            Route::post('/update-status', [LoanManagementController::class, 'loans_update_status'])->name('loans.update.status');                       
+            Route::post('/store', [LoanManagementController::class, 'loans_store'])->name('loans.store');
+            Route::get('/request', [LoanManagementController::class, 'loans_request'])->name('loan.request');
+            Route::post('/update-status', [LoanManagementController::class, 'loans_update_status'])->name('loans.update.status');
         });
-        
+
         Route::prefix('expense-reimbursement')->middleware(['permission:Expense Reimbursement'])->group(function () {
-            Route::get('/list', [ExpenseReimbursementController::class, 'expense_reimbursement_list'])->name('expense.reimbursement.list');            
-            Route::get('/create', [ExpenseReimbursementController::class, 'expense_reimbursement_create'])->name('expense.reimbursement.create');            
-            Route::post('/store', [ExpenseReimbursementController::class, 'expense_reimbursement_store'])->name('expense.reimbursement.store');            
-            Route::post('/update-status', [ExpenseReimbursementController::class, 'expense_reimbursement_update_status'])->name('expense.reimbursement.update.status');            
+            Route::get('/list', [ExpenseReimbursementController::class, 'expense_reimbursement_list'])->name('expense.reimbursement.list');
+            Route::get('/create', [ExpenseReimbursementController::class, 'expense_reimbursement_create'])->name('expense.reimbursement.create');
+            Route::post('/store', [ExpenseReimbursementController::class, 'expense_reimbursement_store'])->name('expense.reimbursement.store');
+            Route::post('/update-status', [ExpenseReimbursementController::class, 'expense_reimbursement_update_status'])->name('expense.reimbursement.update.status');
         });
-        
+
         Route::prefix('Salary')->middleware(['permission:Process Salary'])->group(function () {
-            Route::get('/list', [ExpenseReimbursementController::class, 'expense_reimbursement_list'])->name('expense.reimbursement.list');                            
+            Route::get('/Processing', [SalaryProcessingController::class, 'salary_processing'])->name('salary.Processing');
+            Route::get('/process-status', [SalaryProcessingController::class, 'salary_process_status'])->name('salary.process.status');
+            Route::get('/attendance-preview', [SalaryProcessingController::class, 'salary_attendance_preview'])->name('salary.attendance.preview');
+            Route::post('/attendance-store', [SalaryProcessingController::class, 'salary_attendance_store'])->name('salary.attendance.store');
+            Route::get('/loan-preview', [SalaryProcessingController::class, 'salary_loan_preview'])->name('salary.loan.preview');
+            Route::post('/loan-verify', [SalaryProcessingController::class, 'salary_loan_verify'])->name('salary.loan.verify');
+            Route::get('/expense-preview', [SalaryProcessingController::class, 'salary_expense_preview'])->name('salary.expense.preview');
+            Route::post('/expense-verify', [SalaryProcessingController::class, 'salary_expense_verify'])->name('salary.expense.verify');
+            Route::get('/process-verify', [SalaryProcessingController::class, 'salary_process_verify'])->name('salary.process.verify');
+            Route::Post('/process-save', [SalaryProcessingController::class, 'salary_process_save'])->name('salary.process.save');
+            Route::post('/slip-generate', [SalaryProcessingController::class, 'generate_Salary_Slip'])->name('salary.slip.generate');
+            Route::get('/salary-slip', [SalaryProcessingController::class, 'salary_slip'])->name('salary.slip.page');
+            
+            Route::get('/attendance/{employee_id}/{month}/{year}', [SalaryProcessingController::class, 'salary_attendance_show'])->name('salary.attendance.show');
+            Route::post('/attendance-update', [SalaryProcessingController::class, 'salary_attendance_update'])->name('salary.attendance.update');
+        });
+
+        Route::prefix('category')->middleware(['permission:Category Master'])->group(function () {
+            Route::get('/list', [CategoryController::class, 'category_list'])->name('category.list');
+            Route::post('/store', [CategoryController::class, 'category_store'])->name('category.store');            
+            Route::post('/update', [CategoryController::class, 'category_update'])->name('category.update');            
         });
 
     });
@@ -292,6 +316,22 @@ Route::prefix('employee')->name('employee.')->group(function () {
             Route::get('/', [AttendanceController::class, 'attendance_request'])->name('attendance.request');
             Route::post('/attendance-approve', [AttendanceController::class, 'attendance_approve'])->name('attendance.request.approve');
             Route::post('/attendance-reject', [AttendanceController::class, 'attendance_reject'])->name('attendance.request.reject');
+        });
+
+        Route::prefix('product')->middleware(['permission:Product Master'])->group(function () {
+            Route::get('/list', [ProductController::class, 'product_list'])->name('product.list');
+            Route::get('/create', [ProductController::class, 'product_create'])->name('product.create');
+            Route::post('/store', [ProductController::class, 'product_store'])->name('product.store');         
+            Route::get('/edit/{id}', [ProductController::class, 'product_edit'])->name('product.edit');
+            Route::post('/update', [ProductController::class, 'product_update'])->name('product.update');      
+        });
+
+        Route::prefix('inquiry')->middleware(['permission:Product Inquiry'])->group(function () {
+            Route::get('/list', [InquiryController::class, 'inquiry_list'])->name('inquiry.list');
+            Route::get('/create', [InquiryController::class, 'inquiry_create'])->name('inquiry.create');
+            Route::post('/store', [InquiryController::class, 'inquiry_store'])->name('inquiry.store');
+            Route::get('/edit/{id}', [InquiryController::class, 'inquiry_edit'])->name('inquiry.edit');
+            Route::post('/update', [InquiryController::class, 'inquiry_update'])->name('inquiry.update');
         });
     });
 });
