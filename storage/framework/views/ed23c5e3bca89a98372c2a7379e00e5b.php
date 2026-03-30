@@ -1,6 +1,5 @@
-@extends('admin.layout.main-layout')
-@section('title', config('app.name') . ' || Employee Dashboard')
-@section('content')
+<?php $__env->startSection('title', config('app.name') . ' || Employee Dashboard'); ?>
+<?php $__env->startSection('content'); ?>
     <div class="content">
         <div class="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
             <div class="my-auto mb-2">
@@ -18,41 +17,42 @@
                 </nav>
             </div>
         </div>
-        @foreach ($notifications as $leave)
+        <?php $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $leave): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="alert bg-secondary-transparent alert-dismissible fade show mb-4 leave-alert"
-                data-id="{{ $leave->id }}">
+                data-id="<?php echo e($leave->id); ?>">
 
                 Your Leave Request on
-                <strong>{{ \Carbon\Carbon::parse($leave->from_date)->format('d M Y') }}</strong>
+                <strong><?php echo e(\Carbon\Carbon::parse($leave->from_date)->format('d M Y')); ?></strong>
                 has been
-                <strong class="{{ $leave->status == 'Approved' ? 'text-success' : 'text-danger' }}">
-                    {{ $leave->status }}
+                <strong class="<?php echo e($leave->status == 'Approved' ? 'text-success' : 'text-danger'); ?>">
+                    <?php echo e($leave->status); ?>
+
                 </strong> !!!
 
-                <button type="button" class="btn-close fs-14 mark-read" data-id="{{ $leave->id }}"
+                <button type="button" class="btn-close fs-14 mark-read" data-id="<?php echo e($leave->id); ?>"
                     data-bs-dismiss="alert">
                     <i class="ti ti-x"></i>
                 </button>
             </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         <div class="row">
             <div class="col-xl-4 d-flex">
                 <div class="card position-relative flex-fill">
                     <div class="card-header bg-dark">
                         <div class="d-flex align-items-center">
                             <span class="avatar avatar-lg avatar-rounded border border-white border-2 flex-shrink-0 me-2">
-                                @if (!empty($employee->profile_image))
-                                    <img src="{{ asset($employee->profile_image) }}" alt="Img">
-                                @else
-                                    <img src="{{ asset('admin/img/person-dummy.jpg') }}" alt="Img">
-                                @endif
+                                <?php if(!empty($employee->profile_image)): ?>
+                                    <img src="<?php echo e(asset($employee->profile_image)); ?>" alt="Img">
+                                <?php else: ?>
+                                    <img src="<?php echo e(asset('admin/img/person-dummy.jpg')); ?>" alt="Img">
+                                <?php endif; ?>
                             </span>
                             <div>
-                                <h5 class="text-white mb-1">{{ $employee->name }}</h5>
+                                <h5 class="text-white mb-1"><?php echo e($employee->name); ?></h5>
                                 <div class="d-flex align-items-center">
-                                    <p class="text-white fs-12 mb-0">{{ $employee->designation->name ?? 'N/A' }}</p>
+                                    <p class="text-white fs-12 mb-0"><?php echo e($employee->designation->name ?? 'N/A'); ?></p>
                                     <span class="mx-1"><i class="ti ti-point-filled text-primary"></i></span>
-                                    <p class="fs-12">{{ $employee->department->name ?? 'N/A' }}</p>
+                                    <p class="fs-12"><?php echo e($employee->department->name ?? 'N/A'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -60,35 +60,37 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <span class="d-block mb-1 fs-13">Employee ID</span>
-                            <p class="text-gray-9">{{ $employee->employee_code ?? '-' }}</p>
+                            <p class="text-gray-9"><?php echo e($employee->employee_code ?? '-'); ?></p>
                         </div>
                         <div class="mb-3">
                             <span class="d-block mb-1 fs-13">Phone Number</span>
-                            <p class="text-gray-9">{{ $employee->phone ?? '-' }}</p>
+                            <p class="text-gray-9"><?php echo e($employee->phone ?? '-'); ?></p>
                         </div>
                         <div class="mb-3">
                             <span class="d-block mb-1 fs-13">Email Address</span>
                             <p class="text-gray-9">
                                 <a href="javascript:void(0)" class="text-info d-inline-flex align-items-center copy-email"
-                                    data-email="{{ $employee->email }}">
-                                    {{ $employee->email ?? '-' }}<i class="ti ti-copy text-dark ms-2"></i>
+                                    data-email="<?php echo e($employee->email); ?>">
+                                    <?php echo e($employee->email ?? '-'); ?><i class="ti ti-copy text-dark ms-2"></i>
                                 </a>
                             </p>
                         </div>
                         <div class="mb-3">
                             <span class="d-block mb-1 fs-13">Report Manager</span>
-                            <p class="text-gray-9">{{ $employee->manager->name ?? 'Not Assigned' }}</p>
+                            <p class="text-gray-9"><?php echo e($employee->manager->name ?? 'Not Assigned'); ?></p>
                         </div>
                         <div>
                             <span class="d-block mb-1 fs-13">Joined on</span>
                             <p class="text-gray-9">
-                                @if (optional($employee->profile)->joining_date)
-                                    {{ \Carbon\Carbon::parse($employee->profile->joining_date)->format('d M Y') }}
-                                @elseif($employee->created_at)
-                                    {{ \Carbon\Carbon::parse($employee->created_at)->format('d M Y') }}
-                                @else
+                                <?php if(optional($employee->profile)->joining_date): ?>
+                                    <?php echo e(\Carbon\Carbon::parse($employee->profile->joining_date)->format('d M Y')); ?>
+
+                                <?php elseif($employee->created_at): ?>
+                                    <?php echo e(\Carbon\Carbon::parse($employee->created_at)->format('d M Y')); ?>
+
+                                <?php else: ?>
                                     -
-                                @endif
+                                <?php endif; ?>
                             </p>
                         </div>
                     </div>
@@ -97,7 +99,7 @@
             <div class="col-xl-5 d-flex">
                 <div class="card flex-fill">
                     <div class="card-header">
-                        <h5>Attendance Overview ({{ now()->year }})</h5>
+                        <h5>Attendance Overview (<?php echo e(now()->year); ?>)</h5>
                     </div>
 
                     <div class="card-body">
@@ -110,7 +112,7 @@
                                         </span>
                                         <span class="fw-medium">Present</span>
                                     </div>
-                                    <span class="fw-bold text-success">{{ $presentCount }}</span>
+                                    <span class="fw-bold text-success"><?php echo e($presentCount); ?></span>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between mb-3 p-2 rounded bg-light">
                                     <div class="d-flex align-items-center">
@@ -119,7 +121,7 @@
                                         </span>
                                         <span class="fw-medium">Approval Pending</span>
                                     </div>
-                                    <span class="fw-bold text-warning">{{ $apCount }}</span>
+                                    <span class="fw-bold text-warning"><?php echo e($apCount); ?></span>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between mb-3 p-2 rounded bg-light">
                                     <div class="d-flex align-items-center">
@@ -128,21 +130,21 @@
                                         </span>
                                         <span class="fw-medium">Absent</span>
                                     </div>
-                                    <span class="fw-bold text-danger">{{ $absentCount }}</span>
+                                    <span class="fw-bold text-danger"><?php echo e($absentCount); ?></span>
                                 </div>
                                 <hr class="my-3">
                                 <p class="fw-semibold text-gray-7 mb-2">Leave Breakdown</p>
-                                @foreach ($leaveTypeData as $type => $days)
+                                <?php $__currentLoopData = $leaveTypeData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type => $days): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <div class="d-flex align-items-center">
                                             <span class="avatar avatar-xs bg-info me-2">
                                                 <i class="ti ti-calendar"></i>
                                             </span>
-                                            <span class="fw-medium">{{ $type }}</span>
+                                            <span class="fw-medium"><?php echo e($type); ?></span>
                                         </div>
-                                        <span class="fw-bold text-info">{{ $days }}</span>
+                                        <span class="fw-bold text-info"><?php echo e($days); ?></span>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-md-end">
@@ -165,13 +167,13 @@
                             <div class="col-sm-6">
                                 <div class="mb-4">
                                     <span class="d-block mb-1">Total Leaves</span>
-                                    <h4>{{ $totalleaves }}</h4>
+                                    <h4><?php echo e($totalleaves); ?></h4>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="mb-4">
                                     <span class="d-block mb-1">Taken</span>
-                                    <h4>{{ $takenLeaves }}</h4>
+                                    <h4><?php echo e($takenLeaves); ?></h4>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -183,13 +185,13 @@
                             <div class="col-sm-6">
                                 <div class="mb-4">
                                     <span class="d-block mb-1">Request</span>
-                                    <h4>{{ $pendingLeaves }}</h4>
+                                    <h4><?php echo e($pendingLeaves); ?></h4>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="mb-4">
                                     <span class="d-block mb-1">Remaining</span>
-                                    <h4>{{ $remainingLeaves }}</h4>
+                                    <h4><?php echo e($remainingLeaves); ?></h4>
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -209,7 +211,7 @@
                     <div class="attendance-card card-body">
                         <div class="mb-4 text-center">
                             <h6 class="fw-medium text-gray-5 mb-1">Attendance</h6>
-                            @php
+                            <?php
                                 $today = now();
                                 $displayDate = $today;
                                 if ($attendance && !$attendance->punch_out && $attendance->punch_in) {
@@ -220,8 +222,8 @@
                                     $punchInTime = \Carbon\Carbon::parse($attendance->punch_in)->toTimeString();
                                     $displayDate = \Carbon\Carbon::parse($punchInDate . ' ' . $punchInTime);
                                 }
-                            @endphp
-                            <h4>{{ $displayDate->format('h:i A, d M Y') }}</h4>
+                            ?>
+                            <h4><?php echo e($displayDate->format('h:i A, d M Y')); ?></h4>
                         </div>
                         <div class="attendance-circle-progress attendance-progress mx-auto mb-3">
                             <span class="progress-left">
@@ -239,10 +241,10 @@
                             <h6 class="fw-medium d-flex align-items-center justify-content-center mb-4">
                                 <i class="ti ti-fingerprint text-primary me-1"></i>
                                 <span id="punchText">
-                                    @if (!$attendance)
+                                    <?php if(!$attendance): ?>
                                         Not Punched In
-                                    @elseif(!$attendance->punch_out)
-                                        @php
+                                    <?php elseif(!$attendance->punch_out): ?>
+                                        <?php
                                             $today = now()->format('Y-m-d');
                                             $recordDate = optional($attendance)->date
                                                 ? \Carbon\Carbon::parse($attendance->date)->format('Y-m-d')
@@ -250,65 +252,68 @@
                                             $punchInTime = optional($attendance)->punch_in
                                                 ? \Carbon\Carbon::parse($attendance->punch_in)->format('h:i A')
                                                 : 'Unknown';
-                                        @endphp
+                                        ?>
 
-                                        @if ($recordDate && $recordDate !== $today)
+                                        <?php if($recordDate && $recordDate !== $today): ?>
                                             Pending open punch from
-                                            {{ \Carbon\Carbon::parse($attendance->date)->format('d M Y') }} (In at
-                                            {{ $punchInTime }}) — please complete punch out for this day.
-                                        @else
-                                            Punch In at {{ $punchInTime }}
-                                        @endif
-                                    @else
+                                            <?php echo e(\Carbon\Carbon::parse($attendance->date)->format('d M Y')); ?> (In at
+                                            <?php echo e($punchInTime); ?>) — please complete punch out for this day.
+                                        <?php else: ?>
+                                            Punch In at <?php echo e($punchInTime); ?>
+
+                                        <?php endif; ?>
+                                    <?php else: ?>
                                         Completed
-                                    @endif
+                                    <?php endif; ?>
                                 </span>
                             </h6>
                             <button id="punchBtn" class="btn btn-primary w-100"
-                                {{ $attendance && $attendance->punch_out ? 'disabled' : '' }}
-                                data-type="{{ !$attendance ? 'in' : (!$attendance->punch_out ? 'out' : 'completed') }}">
+                                <?php echo e($attendance && $attendance->punch_out ? 'disabled' : ''); ?>
 
-                                @if (!$attendance)
+                                data-type="<?php echo e(!$attendance ? 'in' : (!$attendance->punch_out ? 'out' : 'completed')); ?>">
+
+                                <?php if(!$attendance): ?>
                                     Punch In
-                                @elseif(!$attendance->punch_out)
+                                <?php elseif(!$attendance->punch_out): ?>
                                     Punch Out
-                                @else
+                                <?php else: ?>
                                     Completed
-                                @endif
+                                <?php endif; ?>
                             </button>
 
                             <button id="customPunchBtn" class="btn btn-outline-secondary w-100 mt-2"
-                                {{ $attendance && $attendance->punch_out ? 'disabled' : '' }}
-                                data-type="{{ !$attendance ? 'in' : (!$attendance->punch_out ? 'out' : 'completed') }}">
-                                @if (!$attendance)
+                                <?php echo e($attendance && $attendance->punch_out ? 'disabled' : ''); ?>
+
+                                data-type="<?php echo e(!$attendance ? 'in' : (!$attendance->punch_out ? 'out' : 'completed')); ?>">
+                                <?php if(!$attendance): ?>
                                     Custom Punch In
-                                @elseif(!$attendance->punch_out)
+                                <?php elseif(!$attendance->punch_out): ?>
                                     Custom Punch Out
-                                @else
+                                <?php else: ?>
                                     Completed
-                                @endif
+                                <?php endif; ?>
                             </button>
-                            @if (!$attendance)
+                            <?php if(!$attendance): ?>
                                 <button id="absentCustomBtn" class="btn btn-outline-danger w-100 mt-2">
                                     <i class="ti ti-calendar-off me-1"></i> Mark Attendance (Both Forgot)
                                 </button>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
                 <input type="hidden" id="punch_in"
-                    value="{{ $attendance && $attendance->punch_in
+                    value="<?php echo e($attendance && $attendance->punch_in
                         ? \Carbon\Carbon::parse($attendance->date)->toDateString() .
                             ' ' .
                             \Carbon\Carbon::parse($attendance->punch_in)->format('H:i:s')
-                        : '' }}">
+                        : ''); ?>">
 
                 <input type="hidden" id="punch_out"
-                    value="{{ $attendance && $attendance->punch_out
+                    value="<?php echo e($attendance && $attendance->punch_out
                         ? \Carbon\Carbon::parse($attendance->date)->toDateString() .
                             ' ' .
                             \Carbon\Carbon::parse($attendance->punch_out)->format('H:i:s')
-                        : '' }}">
+                        : ''); ?>">
             </div>
 
             <div class="col-xl-8 d-flex">
@@ -322,7 +327,8 @@
                                     </span>
 
                                     <h2 class="mb-2">
-                                        {{ $weekHours }}
+                                        <?php echo e($weekHours); ?>
+
                                         / <span class="fs-20 text-gray-5">45</span>
                                     </h2>
 
@@ -339,7 +345,8 @@
                                         <i class="ti ti-calendar-up"></i>
                                     </span>
                                     <h2 class="mb-2">
-                                        {{ $monthHours }}
+                                        <?php echo e($monthHours); ?>
+
                                         / <span class="fs-20 text-gray-5">180</span>
                                     </h2>
                                     <p class="fw-medium text-truncate">Total Hours Month</p>
@@ -355,7 +362,8 @@
                                         <i class="ti ti-clock-plus"></i>
                                     </span>
                                     <h2 class="mb-2">
-                                        {{ $weekOvertime }}
+                                        <?php echo e($weekOvertime); ?>
+
                                     </h2>
                                     <p class="fw-medium text-truncate">Overtime This Week</p>
                                 </div>
@@ -370,7 +378,8 @@
                                         <i class="ti ti-calendar-star"></i>
                                     </span>
                                     <h2 class="mb-2">
-                                        {{ $monthOvertime }}
+                                        <?php echo e($monthOvertime); ?>
+
                                     </h2>
                                     <p class="fw-medium text-truncate">Overtime This Month</p>
                                 </div>
@@ -393,7 +402,7 @@
                     </button>
                 </div>
                 <form id="leaveForm">
-                    @csrf
+                    <?php echo csrf_field(); ?>
                     <div class="modal-body pb-0">
                         <div class="row">
                             <div class="col-md-12">
@@ -401,11 +410,12 @@
                                     <label class="form-label">Leave Type <span class="text-danger">*</span></label>
                                     <select name="leave_type_id" id="leave_type_id" class="form-control">
                                         <option value="">Select</option>
-                                        @foreach ($leaves as $type)
-                                            <option value="{{ $type->leave_type_id }}">
-                                                {{ $type->leaveType->name }}
+                                        <?php $__currentLoopData = $leaves; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($type->leave_type_id); ?>">
+                                                <?php echo e($type->leaveType->name); ?>
+
                                             </option>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                     <span class="text-danger error-text leave_type_id_error"></span>
                                 </div>
@@ -799,10 +809,10 @@
                 let meta = await collectPunchMeta('in');
 
                 $.ajax({
-                    url: "{{ route('employee.attendance.punch') }}",
+                    url: "<?php echo e(route('employee.attendance.punch')); ?>",
                     type: 'POST',
                     data: {
-                        _token: "{{ csrf_token() }}",
+                        _token: "<?php echo e(csrf_token()); ?>",
                         type: 'in',
                         ...punchData,
                         ...meta
@@ -1067,10 +1077,10 @@ function convertTo24Hour(time12h) {
             let punchOutDate = new Date().toISOString().slice(0, 10); // 30th march case me 30 bnega
 
             $.ajax({
-                url: "{{ route('employee.attendance.punch') }}",
+                url: "<?php echo e(route('employee.attendance.punch')); ?>",
                 type: 'POST',
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token: "<?php echo e(csrf_token()); ?>",
                     type: 'out',
                     custom: 1,
                     in_time: result.value.in_time,
@@ -1084,10 +1094,10 @@ function convertTo24Hour(time12h) {
 
                     if (pendingInData) {
                         $.ajax({
-                            url: "{{ route('employee.attendance.punch') }}",
+                            url: "<?php echo e(route('employee.attendance.punch')); ?>",
                             type: 'POST',
                             data: {
-                                _token: "{{ csrf_token() }}",
+                                _token: "<?php echo e(csrf_token()); ?>",
                                 type: 'in',
                                 ...pendingInData,
                                 ...pendingInMeta
@@ -1179,10 +1189,10 @@ function convertTo24Hour(time12h) {
 
             // Pehle custom punch in
             $.ajax({
-                url: "{{ route('employee.attendance.punch') }}",
+                url: "<?php echo e(route('employee.attendance.punch')); ?>",
                 type: 'POST',
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token: "<?php echo e(csrf_token()); ?>",
                     type: 'in',
                     custom: 1,
                     in_time: result.value.in_time,
@@ -1191,10 +1201,10 @@ function convertTo24Hour(time12h) {
                 success: () => {
                     // Phir custom punch out
                     $.ajax({
-                        url: "{{ route('employee.attendance.punch') }}",
+                        url: "<?php echo e(route('employee.attendance.punch')); ?>",
                         type: 'POST',
                         data: {
-                            _token: "{{ csrf_token() }}",
+                            _token: "<?php echo e(csrf_token()); ?>",
                             type: 'out',
                             custom: 1,
                             in_time: result.value.in_time,
@@ -1230,10 +1240,10 @@ function convertTo24Hour(time12h) {
         // ── Submit helper ──────────────────────────────────────
         function submitPunch(type, data) {
             $.ajax({
-                url: "{{ route('employee.attendance.punch') }}",
+                url: "<?php echo e(route('employee.attendance.punch')); ?>",
                 type: 'POST',
                 data: {
-                    _token: "{{ csrf_token() }}",
+                    _token: "<?php echo e(csrf_token()); ?>",
                     type,
                     ...data
                 },
@@ -1286,4 +1296,6 @@ function convertTo24Hour(time12h) {
             startTotalHoursTimer();
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layout.main-layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Varahi\resources\views/admin/employee_dashboard.blade.php ENDPATH**/ ?>

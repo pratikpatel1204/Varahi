@@ -9,100 +9,224 @@ use Illuminate\Support\Carbon;
 
 class AttendanceController extends Controller
 {
-    public function attendance_punch(Request $request)
+public function attendance_punch(Request $request)
     {
+
         $request->validate([
-            'type' => 'required|in:in,out',
-            'in_time' => 'nullable',
-            'out_time' => 'nullable',
-            'reason' => 'nullable|string'
+            'type'                => 'required|in:in,out',
+            'in_time'             => 'nullable',
+            'out_time'            => 'nullable',
+            'punch_out_date'      => 'nullable|date',
+            'reason'              => 'nullable|string',
+            'custom'              => 'nullable|in:0,1',
+            'punch_in_latitude'   => 'nullable|numeric',
+            'punch_in_longitude'  => 'nullable|numeric',
+            'punch_out_latitude'  => 'nullable|numeric',
+            'punch_out_longitude' => 'nullable|numeric',
+            'punch_in_photo'      => 'nullable|string',
+            'punch_out_photo'     => 'nullable|string',
         ]);
 
-        $user = auth()->user();
-
+        $user  = auth()->user();
         $today = now()->toDateString();
-        $todayDate = Carbon::today();
 
-        $attendance = Attendance::where('user_id', $user->id)->whereDate('date', $today)->first();
+        // ══════════════════════════════════════════════════
+        // CONFIGURATION - Timing Rules
+        // ══════════════════════════════════════════════════
+        $LATE_PUNCH_IN_TIME = '10:00';    // 10:00 AM ke baad reason mandatory
+        $EARLY_PUNCH_OUT_TIME = '19:00'; // 7:00 PM se pehle reason mandatory
 
-        if (!$attendance) {
-            $attendance = Attendance::where('user_id', $user->id)->whereNull('punch_out')->latest('date')->first();
-        }
+        // ── Photo save helper ──────────────────────────────
+        $savePhoto = function (?string $base64, string $prefix) use ($user): ?string {
+            if (!$base64) return null;
+            try {
+                $data     = preg_replace('#^data:image/\w+;base64,#i', '', $base64);
+                $decoded  = base64_decode($data);
+                if (!$decoded) return null;
+                $dir      = public_path('uploads/attendance');
+                if (!file_exists($dir)) mkdir($dir, 0755, true);
+                $filename = $prefix . '_' . $user->id . '_' . time() . '.jpg';
+                file_put_contents($dir . '/' . $filename, $decoded);
+                return 'uploads/attendance/' . $filename;
+            } catch (\Throwable $e) {
+                return null;
+            }
+        };
 
+        // ── Aaj ki attendance ──────────────────────────────
+        $todayAttendance = Attendance::where('user_id', $user->id)
+                            ->whereDate('date', $today)
+                            ->first();
+
+        // ── Pichle din ki incomplete attendance ─────────────
+        $prevIncomplete = Attendance::where('user_id', $user->id)
+                            ->whereNull('punch_out')
+                            ->whereDate('date', '<', $today)
+                            ->latest('date')
+                            ->first();
+
+        // ══════════════════════════════════════════════════
+        // PUNCH IN
+        // ══════════════════════════════════════════════════
         if ($request->type === 'in') {
 
-            if ($attendance) {
+            if ($prevIncomplete) {
                 return response()->json([
-                    'message' => 'Already punched in'
-                ], 400);
+                    'message'  => 'incomplete_prev',
+                    'prev_date'=> $prevIncomplete->date,
+                    'punch_in' => $prevIncomplete->punch_in,
+                ], 422);
             }
 
+            if ($todayAttendance) {
+                return response()->json(['message' => 'Already punched in today'], 400);
+            }
+
+            // ✅ Punch In Time decide karo
+            $punchInTime = $request->in_time
+                ? Carbon::parse($request->in_time)->format('H:i:s')
+                : now()->format('H:i:s');
+
+            $attendanceDate = $today;
+            if ($request->in_time) {
+                $enteredTs = Carbon::today()->setTimeFromTimeString($punchInTime);
+                if ($enteredTs->greaterThan(now()->addMinutes(10))) {
+                    $attendanceDate = Carbon::yesterday()->toDateString();
+                }
+            }
+
+            // ══════════════════════════════════════════════════
+            // ✅ VALIDATION: Late Punch In (10:00 AM ke baad)
+            // ══════════════════════════════════════════════════
+            $punchInHourMinute = Carbon::parse($punchInTime)->format('H:i');
+
+            if ($punchInHourMinute > $LATE_PUNCH_IN_TIME) {
+                // Agar custom=1 hai toh reason already hoga
+                // Agar normal punch in hai toh reason check karo
+                if ($request->custom != 1 && !$request->reason) {
+                    return response()->json([
+                        'message' => 'Late punch in detected. Reason is required for punch in after 10:00 AM.',
+                        'require_reason' => true,
+                        'type' => 'late_punch_in'
+                    ], 422);
+                }
+            }
+
+            $photo = $savePhoto($request->punch_in_photo, 'punch_in');
+
             Attendance::create([
-                'user_id'   => $user->id,
-                'date'      => $today,
-                'year'      => $todayDate->year,
-                'month'     => $todayDate->format('F'),
-                'punch_in'  => $request->in_time ?? now()->format('H:i:s'),
-                'status'    => 'Pending',
+                'user_id'              => $user->id,
+                'date'                 => $attendanceDate,
+                'year'                 => Carbon::parse($attendanceDate)->year,
+                'month'                => Carbon::parse($attendanceDate)->format('F'),
+                'punch_in'             => $punchInTime,
+                'punch_in_latitude'    => $request->punch_in_latitude,
+                'punch_in_longitude'   => $request->punch_in_longitude,
+                'punch_in_photo'       => $photo,
+                'is_manual'            => $request->custom == 1 ? 1 : 0,
+                'reason'               => $request->reason,
+                'status'               => $request->custom == 1 ? 'Pending' : 'Approved',
                 'reporting_manager_id' => $user->reporting_manager ?? null,
             ]);
 
-            return response()->json([
-                'message' => 'Punch In successful'
-            ]);
+            return response()->json(['message' => 'Punch In successful']);
         }
 
-        if ($request->type === 'out') {
+        // ══════════════════════════════════════════════════
+        // PUNCH OUT
+        // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// PUNCH OUT
+// ══════════════════════════════════════════════════
+if ($request->type === 'out') {
+    $target = $prevIncomplete ?? $todayAttendance;
 
-            if (!$attendance) {
-                return response()->json([
-                    'message' => 'Punch In first'
-                ], 400);
-            }
-
-            if ($attendance->punch_out) {
-                return response()->json([
-                    'message' => 'Already punched out'
-                ], 400);
-            }
-
-            // Use provided or current time
-            $inTime = $request->in_time ?? $attendance->punch_in;
-            $outTime = $request->out_time ?? now()->format('H:i:s');
-
-            // Convert to Carbon
-            $in = Carbon::parse($inTime);
-            $out = Carbon::parse($outTime);
-
-            // Calculate total hours
-            $totalSeconds = $out->diffInSeconds($in);
-            $totalHours = gmdate('H:i:s', $totalSeconds);
-
-            if ($request->custom == 1) {
-                $attendance->update([
-                    'punch_in'   => $inTime, // update if custom
-                    'punch_out'  => $outTime,
-                    'total_hours' => $totalHours,
-                    'is_manual'  => 1,
-                    'reason'     => $request->reason,
-                    'status'     => 'Pending',
-                    'reporting_manager_id' => $user->reporting_manager ?? null,
-                ]);
-            } else {
-                $attendance->update([
-                    'punch_out'  => $outTime,
-                    'total_hours' => $totalHours,
-                    'is_manual'  => 0,
-                    'status'     => 'Approved',
-                    'reporting_manager_id' => $user->reporting_manager ?? null,
-                ]);
-            }
-            return response()->json([
-                'message' => 'Punch Out successful'
-            ]);
-        }
+    if (!$target) {
+        return response()->json(['message' => 'No active punch in found'], 400);
     }
 
+    if ($target->punch_out) {
+        return response()->json(['message' => 'Already punched out'], 400);
+    }
+
+    $photo = $savePhoto($request->punch_out_photo, 'punch_out');
+
+    // ✅ Helper function to extract ONLY time (H:i:s) from any format
+    $extractTime = function ($time) {
+        if (!$time) return now()->format('H:i:s');
+        try {
+            return Carbon::parse($time)->format('H:i:s');
+        } catch (\Exception $e) {
+            return now()->format('H:i:s');
+        }
+    };
+
+    // ✅ Get raw values
+    $rawInTime  = $request->in_time ?? $target->punch_in;
+    $rawOutTime = $request->out_time ?? now();
+
+    // ✅ Extract ONLY time part (H:i:s) - removes date if present
+    $inTime  = $extractTime($rawInTime);
+    $outTime = $extractTime($rawOutTime);
+
+    // ✅ Punch out date
+    if ($request->punch_out_date) {
+        $punchOutDate = Carbon::parse($request->punch_out_date)->format('Y-m-d');
+    } elseif ($target->date && Carbon::parse($target->date)->lt(Carbon::today())) {
+        $punchOutDate = Carbon::today()->format('Y-m-d');
+    } else {
+        $punchOutDate = $today;
+    }
+
+    // ✅ Dates properly format karo
+    $punchInDate  = Carbon::parse($target->date)->format('Y-m-d');
+    $punchOutDate = Carbon::parse($punchOutDate)->format('Y-m-d');
+
+    // ✅ Create Carbon objects with proper date and time
+    $in  = Carbon::createFromFormat('Y-m-d H:i:s', "{$punchInDate} {$inTime}");
+    $out = Carbon::createFromFormat('Y-m-d H:i:s', "{$punchOutDate} {$outTime}");
+
+    // ✅ Overnight case - if punch out is on same day and before punch in time
+    if ($punchOutDate === $punchInDate && $out->lt($in)) {
+        $out->addDay();
+        $punchOutDate = Carbon::parse($punchOutDate)->addDay()->format('Y-m-d');
+    }
+
+    $totalSeconds = $out->diffInSeconds($in);
+    $totalHours   = gmdate('H:i:s', $totalSeconds);
+
+    if ($request->custom == 1) {
+        $target->update([
+            'punch_in'             => $inTime,
+            'punch_out'            => $outTime,
+            'punch_out_date'       => $punchOutDate,
+            'total_hours'          => $totalHours,
+            'is_manual'            => 1,
+            'reason'               => $request->reason,
+            'status'               => 'Pending',
+            'punch_out_latitude'   => $request->punch_out_latitude,
+            'punch_out_longitude'  => $request->punch_out_longitude,
+            'punch_out_photo'      => $photo,
+            'reporting_manager_id' => $user->reporting_manager ?? null,
+        ]);
+    } else {
+        $target->update([
+            'punch_out'            => $outTime,
+            'punch_out_date'       => $punchOutDate,
+            'total_hours'          => $totalHours,
+            'is_manual'            => 0,
+            'reason'               => $request->reason,
+            'status'               => 'Approved',
+            'punch_out_latitude'   => $request->punch_out_latitude,
+            'punch_out_longitude'  => $request->punch_out_longitude,
+            'punch_out_photo'      => $photo,
+            'reporting_manager_id' => $user->reporting_manager ?? null,
+        ]);
+    }
+
+    return response()->json(['message' => 'Punch Out successful']);
+}
+    }
     public function employee_my_attendance(Request $request)
     {
         $user = auth()->user();

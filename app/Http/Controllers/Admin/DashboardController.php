@@ -60,9 +60,13 @@ class DashboardController extends Controller
             $attendance = Attendance::where('user_id', $id)
                 ->whereDate('date', $today)
                 ->first();
-           
+
             if (!$attendance) {
-                $attendance = Attendance::where('user_id', $id)->whereNull('punch_out')->latest('date')->first();
+                $attendance = Attendance::where('user_id', $id)
+                    ->whereNull('punch_out')
+                    ->whereDate('date', '>=', Carbon::now()->subDay()->format('Y-m-d'))
+                    ->latest('date')
+                    ->first();
             }
             $weekStart = Carbon::now()->startOfWeek();
             $weekEnd   = Carbon::now()->endOfWeek();
@@ -143,7 +147,7 @@ class DashboardController extends Controller
                     return $items->sum('days');
                 });
 
-            $leaveCount = $leaveTypeData->sum(); 
+            $leaveCount = $leaveTypeData->sum();
             $leaveLabels = $leaveTypeData->keys();
             $leaveValues = $leaveTypeData->values();
 

@@ -44,7 +44,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',    
+        'password' => 'hashed',
         'pf_applicable' => 'boolean',
         'esic_applicable' => 'boolean',
     ];
@@ -56,7 +56,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(EmployeeProfile::class, 'employee_id');
     }
-    
+
     // Department
     public function department()
     {
@@ -104,6 +104,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmployeeAddon::class, 'employee_id')->with('addonType');
     }
+    public function bloodGroup()
+{
+    return $this->belongsTo(BloodGroup::class);
+}
 
     // -------------------------
     // Scopes
@@ -114,13 +118,13 @@ class User extends Authenticatable
         $user = auth()->user();
 
         if (!$user) {
-            return $query->whereRaw('0 = 1'); 
+            return $query->whereRaw('0 = 1');
         }
 
         if (!in_array($user->role, ['admin', 'super admin'])) {
-            $query->where('id', $user->id); 
+            $query->where('id', $user->id);
         } else {
-            $query->where('role', '!=', 'super admin'); 
+            $query->where('role', '!=', 'super admin');
         }
 
         return $query;

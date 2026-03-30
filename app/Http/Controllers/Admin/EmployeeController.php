@@ -480,7 +480,7 @@ class EmployeeController extends Controller
 
         $salaryYears = EmployeeSalaryYear::with('year')
             ->where('employee_id', $employee->id)
-            ->orderBy('year_id', 'desc')
+            ->orderBy('year', 'desc')
             ->get();
 
         return view(
@@ -1253,7 +1253,7 @@ class EmployeeController extends Controller
 
         $salaryYears = EmployeeSalaryYear::with('year')
             ->where('employee_id', $id)
-            ->latest('year_id')
+            ->latest('year')
             ->get();
 
         return view(

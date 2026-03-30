@@ -2,43 +2,43 @@
 <div class="sidebar" id="sidebar">
     <!-- Logo -->
     <div class="sidebar-logo">
-        <a href="{{ route('admin.dashboard') }}" class="logo logo-normal text-center">
-            <img src="{{ asset('admin/img/logo.png') }}" alt="Logo" style="height:50px; width:auto;">
+        <a href="<?php echo e(route('admin.dashboard')); ?>" class="logo logo-normal text-center">
+            <img src="<?php echo e(asset('admin/img/logo.png')); ?>" alt="Logo" style="height:50px; width:auto;">
         </a>
-        <a href="{{ route('admin.dashboard') }}" class="logo-small">
-            <img src="{{ asset('admin/img/logo-small.png') }}" alt="Logo">
+        <a href="<?php echo e(route('admin.dashboard')); ?>" class="logo-small">
+            <img src="<?php echo e(asset('admin/img/logo-small.png')); ?>" alt="Logo">
         </a>
-        <a href="{{ route('admin.dashboard') }}" class="dark-logo">
-            <img src="{{ asset('admin/img/logo-white.png') }}" alt="Logo">
+        <a href="<?php echo e(route('admin.dashboard')); ?>" class="dark-logo">
+            <img src="<?php echo e(asset('admin/img/logo-white.png')); ?>" alt="Logo">
         </a>
     </div>
     <!-- /Logo -->
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
-                @can('View dashboard')
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View dashboard')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.dashboard') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.dashboard')); ?>" class="px-2">
                                     <i class="ti ti-smart-home"></i><span> Dashboard</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Employee dashboard')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Employee dashboard')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.dashboard') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.dashboard')); ?>" class="px-2">
                                     <i class="ti ti-smart-home"></i><span> Dashboard</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @canany(['View Roles', 'View Permissions'])
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any(['View Roles', 'View Permissions'])): ?>
                     <li>
                         <ul class="m-0">
                             <li class="submenu">
@@ -47,21 +47,21 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    @can('View Roles')
-                                        <li><a href="{{ route('admin.roles.list') }}">Role List</a></li>
-                                    @endcan
-                                    @can('View Permissions')
-                                        <li><a href="{{ route('admin.permissions.list') }}">Permission List</a></li>
-                                    @endcan
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Roles')): ?>
+                                        <li><a href="<?php echo e(route('admin.roles.list')); ?>">Role List</a></li>
+                                    <?php endif; ?>
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Permissions')): ?>
+                                        <li><a href="<?php echo e(route('admin.permissions.list')); ?>">Permission List</a></li>
+                                    <?php endif; ?>
                                 </ul>
                             </li>
                         </ul>
                     </li>
-                @endcanany
+                <?php endif; ?>
 
-                {{-- ================= COMPANY MASTER ================= --}}
-                @canany(['View Working Days', 'View Leaves', 'View Years', 'View Salary Types', 'View PF', 'View ESIC',
-                    'View Monthly Working'])
+                
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any(['View Working Days', 'View Leaves', 'View Years', 'View Salary Types', 'View PF', 'View ESIC',
+                    'View Monthly Working'])): ?>
                     <li>
                         <ul class="m-0">
                             <li class="submenu">
@@ -73,77 +73,77 @@
 
                                 <ul>
 
-                                    @can('View Working Days')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Working Days')): ?>
                                         <li>
-                                            <a href="{{ route('admin.designation-working-days.index') }}">
+                                            <a href="<?php echo e(route('admin.designation-working-days.index')); ?>">
                                                 <i class="ti ti-calendar-time"></i>
                                                 <span>Assign Working Days</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Leaves')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Leaves')): ?>
                                         <li>
-                                            <a href="{{ route('admin.designation.leaves.index') }}">
+                                            <a href="<?php echo e(route('admin.designation.leaves.index')); ?>">
                                                 <i class="ti ti-calendar-off"></i>
                                                 <span>Assign Leaves</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Years')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Years')): ?>
                                         <li>
-                                            <a href="{{ route('admin.years.index') }}">
+                                            <a href="<?php echo e(route('admin.years.index')); ?>">
                                                 <i class="ti ti-calendar-time"></i>
                                                 <span>Year Master</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Salary Types')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Salary Types')): ?>
                                         <li>
-                                            <a href="{{ route('admin.salary-types.index') }}">
+                                            <a href="<?php echo e(route('admin.salary-types.index')); ?>">
                                                 <i class="ti ti-currency-dollar"></i>
                                                 <span>Salary Types</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View PF')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View PF')): ?>
                                         <li>
-                                            <a href="{{ route('admin.pf.index') }}">
+                                            <a href="<?php echo e(route('admin.pf.index')); ?>">
                                                 <i class="ti ti-building-bank"></i>
                                                 <span>PF Settings</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View ESIC')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View ESIC')): ?>
                                         <li>
-                                            <a href="{{ route('admin.esic.index') }}">
+                                            <a href="<?php echo e(route('admin.esic.index')); ?>">
                                                 <i class="ti ti-building-bank"></i>
                                                 <span>Employer ESIC Settings</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Monthly Working')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Monthly Working')): ?>
                                         <li>
-                                            <a href="{{ route('admin.monthly_working.create') }}">
+                                            <a href="<?php echo e(route('admin.monthly_working.create')); ?>">
                                                 <i class="ti ti-calendar"></i>
                                                 <span>Monthly Working Days</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
                                 </ul>
                             </li>
                         </ul>
                     </li>
-                @endcanany
+                <?php endif; ?>
 
-                {{-- ================= EMPLOYEE MASTER ================= --}}
-                @canany([
+                
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any([
                     'View Departments',
                     'View Sub Departments',
                     'View Designations',
@@ -154,7 +154,7 @@
                     'View Qualification',
                     'Working Days Master',
                     'View Courses',
-                    ])
+                    ])): ?>
                     <li>
                         <ul class="m-0">
                             <li class="submenu">
@@ -165,103 +165,103 @@
                                 </a>
 
                                 <ul>
-                                    @can('View Departments')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Departments')): ?>
                                         <li>
-                                            <a href="{{ route('admin.departments.index') }}">
+                                            <a href="<?php echo e(route('admin.departments.index')); ?>">
                                                 <i class="ti ti-building"></i>
                                                 <span>Department Master</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Sub Departments')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Sub Departments')): ?>
                                         <li>
-                                            <a href="{{ route('admin.sub-departments.index') }}">
+                                            <a href="<?php echo e(route('admin.sub-departments.index')); ?>">
                                                 <i class="ti ti-building-arch"></i>
                                                 <span>Sub Department</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Designations')
-                                        <li><a href="{{ route('admin.designations.index') }}">
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Designations')): ?>
+                                        <li><a href="<?php echo e(route('admin.designations.index')); ?>">
                                                 <i class="ti ti-id-badge"></i>
                                                 <span>Designation</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Blood Groups')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Blood Groups')): ?>
                                         <li>
-                                            <a href="{{ route('admin.blood-groups.index') }}">
+                                            <a href="<?php echo e(route('admin.blood-groups.index')); ?>">
                                                 <i class="ti ti-droplet"></i>
                                                 <span>Blood Group</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Holidays')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Holidays')): ?>
                                         <li>
-                                            <a href="{{ route('admin.holidays.index') }}">
+                                            <a href="<?php echo e(route('admin.holidays.index')); ?>">
                                                 <i class="ti ti-calendar-event"></i>
                                                 <span>Holiday</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Leave Types')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Leave Types')): ?>
                                         <li>
-                                            <a href="{{ route('admin.leave-types.index') }}">
+                                            <a href="<?php echo e(route('admin.leave-types.index')); ?>">
                                                 <i class="ti ti-calendar"></i>
                                                 <span>Leave Types</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Qualification')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Qualification')): ?>
                                         <li>
-                                            <a href="{{ route('admin.qualification.areas.index') }}">
+                                            <a href="<?php echo e(route('admin.qualification.areas.index')); ?>">
                                                 <i class="ti ti-school"></i>
                                                 <span>Qualification Area</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('Working Days Master')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Working Days Master')): ?>
                                         <li>
-                                            <a href="{{ route('admin.working.days.index') }}">
+                                            <a href="<?php echo e(route('admin.working.days.index')); ?>">
                                                 <i class="ti ti-calendar-stats"></i>
                                                 <span>Working Days</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
-                                    @can('View Courses')
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Courses')): ?>
                                         <li>
-                                            <a href="{{ route('admin.courses.index') }}">
+                                            <a href="<?php echo e(route('admin.courses.index')); ?>">
                                                 <i class="ti ti-book"></i>
                                                 <span>Courses</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
 
                                 </ul>
                             </li>
                         </ul>
                     </li>
-                @endcanany
-                @can('View Employees')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Employees')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.employees.index') }}">
+                                <a href="<?php echo e(route('admin.employees.index')); ?>">
                                     <i class="ti ti-users"></i>
                                     <span>Employee Management</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
+                <?php endif; ?>
 
 
 
@@ -274,92 +274,92 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
-                                    @can('View Assets')
-                                        <li><a href="{{ route('admin.id.cards.index') }}">
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Assets')): ?>
+                                        <li><a href="<?php echo e(route('admin.id.cards.index')); ?>">
                 <i class="ti ti-credit-card"></i>
                                                 <span>Generate ID Card</span>
                                             </a>
                                         </li>
-                                    @endcan
-                                    @can('Assign Assets')
+                                    <?php endif; ?>
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Assign Assets')): ?>
                                         <li>
-                                            <a href="{{ route('admin.id.cards.report') }}">
+                                            <a href="<?php echo e(route('admin.id.cards.report')); ?>">
                 <i class="ti ti-report"></i>
                                                 <span>Already Generated ID Cards</span>
                                             </a>
                                         </li>
-                                    @endcan
-                                    @can('View Asset History')
+                                    <?php endif; ?>
+                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Asset History')): ?>
                                         <li>
-                                            <a href="{{ route('admin.id.card.template.index') }}">
+                                            <a href="<?php echo e(route('admin.id.card.template.index')); ?>">
                 <i class="ti ti-template"></i>
                                                 <span>ID Card Template</span>
                                             </a>
                                         </li>
-                                    @endcan
+                                    <?php endif; ?>
                                 </ul>
                             </li>
                         </ul>
                     </li>
 
 
-                @canany(['View Assets', 'Assign Assets', 'View Asset History'])
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->any(['View Assets', 'Assign Assets', 'View Asset History'])): ?>
 
-                @endcanany
+                <?php endif; ?>
 
-                @can('Employee Profile')
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Employee Profile')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.profile') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.profile')); ?>" class="px-2">
                                     <i class="ti ti-user"></i>
                                     <span>Profile</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Employee My Leaves')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Employee My Leaves')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.my.leaves') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.my.leaves')); ?>" class="px-2">
                                     <i class="ti ti-calendar"></i>
                                     <span>My Leaves</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Employee Leaves Request')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Employee Leaves Request')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.leave.requests') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.leave.requests')); ?>" class="px-2">
                                     <i class="ti ti-file-text"></i>
                                     <span>Leaves Request</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Attendance Management')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Attendance Management')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.leave.requests') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.leave.requests')); ?>" class="px-2">
                                     <i class="ti ti-file-text"></i>
                                     <span>Attendance Management</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('My Attendance')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('My Attendance')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.my.attendance') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.my.attendance')); ?>" class="px-2">
                                     <i class="ti ti-calendar"></i>
                                     <span>My Attendance</span>
                                 </a>
@@ -367,96 +367,96 @@
 
                         </ul>
                     </li>
-                @endcan
-                @can('Attendance Request')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Attendance Request')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.attendance.request') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.attendance.request')); ?>" class="px-2">
                                     <i class="ti ti-file-text"></i>
                                     <span>Attendance Request</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Loan Management')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Loan Management')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.loan.request') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.loan.request')); ?>" class="px-2">
                                     <i class="ti ti-send"></i>
                                     <span>Loan Management</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Expense Reimbursement')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Expense Reimbursement')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.expense.reimbursement.list') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.expense.reimbursement.list')); ?>" class="px-2">
                                     <i class="ti ti-receipt"></i>
                                     <span>Expense/Reimbursement</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Process Salary')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Process Salary')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.salary.Processing') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.salary.Processing')); ?>" class="px-2">
                                     <i class="ti ti-cash"></i>
                                     <span>Process Salary</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Category Master')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Category Master')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.category.list') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.category.list')); ?>" class="px-2">
                                     <i class="ti ti-list"></i>
                                     <span>Category Master</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Product Master')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Product Master')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.product.list') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.product.list')); ?>" class="px-2">
                                     <i class="ti ti-package"></i>
                                     <span>Product Master</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('Product Inquiry')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Product Inquiry')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('employee.inquiry.list') }}" class="px-2">
+                                <a href="<?php echo e(route('employee.inquiry.list')); ?>" class="px-2">
                                     <i class="ti ti-search"></i>
                                     <span>Product Inquiry</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
-                @endcan
-                @can('View Site setting')
+                <?php endif; ?>
+                <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('View Site setting')): ?>
                     <li>
                         <ul class="m-0">
                             <li>
-                                <a href="{{ route('admin.site-settings.index') }}" class="px-2">
+                                <a href="<?php echo e(route('admin.site-settings.index')); ?>" class="px-2">
                                        <i class=" ti ti-building"></i>
                                    <span>Site Setting</span>
 
@@ -465,10 +465,11 @@
                         </ul>
                     </li>
 
-    @endcan
+    <?php endif; ?>
 
             </ul>
         </div>
     </div>
 </div>
 <!-- /Sidebar -->
+<?php /**PATH C:\Varahi\resources\views/admin/layout/Sidebar.blade.php ENDPATH**/ ?>

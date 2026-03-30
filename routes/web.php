@@ -10,25 +10,27 @@ use App\Http\Controllers\admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\DepartmentController;
 use App\Http\Controllers\admin\DesignationController;
-use App\Http\Controllers\admin\DesignationLeaveController;
-use App\Http\Controllers\admin\DesignationWorkingDayController;
-use App\Http\Controllers\admin\EmployeeController;
-use App\Http\Controllers\admin\EmployerEsicController;
+use App\Http\Controllers\Admin\DesignationLeaveController;
+use App\Http\Controllers\Admin\DesignationWorkingDayController;
+use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\EmployerEsicController;
 use App\Http\Controllers\Admin\ExpenseReimbursementController;
 use App\Http\Controllers\admin\HolidayController;
 use App\Http\Controllers\Admin\InquiryController;
-use App\Http\Controllers\admin\LeaveTypeController;
-use App\Http\Controllers\admin\LoanManagementController;
+use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\LeaveTypeController;
+use App\Http\Controllers\Admin\LoanManagementController;
 use App\Http\Controllers\Admin\PermissionController;
-use App\Http\Controllers\admin\PFController;
-use App\Http\Controllers\admin\ProductController;
-use App\Http\Controllers\admin\QualificationAreaController;
+use App\Http\Controllers\Admin\PFController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\QualificationAreaController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SalaryProcessingController;
-use App\Http\Controllers\admin\SalaryTypeController;
-use App\Http\Controllers\admin\SubDepartmentController;
-use App\Http\Controllers\admin\WorkingDayController;
-use App\Http\Controllers\admin\YearController;
+use App\Http\Controllers\Admin\SalaryTypeController;
+use App\Http\Controllers\Admin\IdCardController;
+use App\Http\Controllers\Admin\SubDepartmentController;
+use App\Http\Controllers\Admin\WorkingDayController;
+use App\Http\Controllers\Admin\YearController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Route;
@@ -269,17 +271,35 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::Post('/process-save', [SalaryProcessingController::class, 'salary_process_save'])->name('salary.process.save');
             Route::post('/slip-generate', [SalaryProcessingController::class, 'generate_Salary_Slip'])->name('salary.slip.generate');
             Route::get('/salary-slip', [SalaryProcessingController::class, 'salary_slip'])->name('salary.slip.page');
-            
+
             Route::get('/attendance/{employee_id}/{month}/{year}', [SalaryProcessingController::class, 'salary_attendance_show'])->name('salary.attendance.show');
             Route::post('/attendance-update', [SalaryProcessingController::class, 'salary_attendance_update'])->name('salary.attendance.update');
         });
 
         Route::prefix('category')->middleware(['permission:Category Master'])->group(function () {
             Route::get('/list', [CategoryController::class, 'category_list'])->name('category.list');
-            Route::post('/store', [CategoryController::class, 'category_store'])->name('category.store');            
-            Route::post('/update', [CategoryController::class, 'category_update'])->name('category.update');            
+            Route::post('/store', [CategoryController::class, 'category_store'])->name('category.store');
+            Route::post('/update', [CategoryController::class, 'category_update'])->name('category.update');
         });
 
+
+        // ID Card Generate
+Route::get('id-cards',                    [IdCardController::class, 'index'])->name('id.cards.index');
+Route::post('id-cards/ajax-without',      [IdCardController::class, 'ajaxWithoutIdCard'])->name('id.cards.ajaxWithout');
+Route::get('id-cards/generate',           [IdCardController::class, 'generate'])->name('id.cards.generate');
+Route::get('id-cards/reprint',            [IdCardController::class, 'reprint'])->name('id.cards.reprint');
+Route::delete('id-cards/delete/{id}',     [IdCardController::class, 'delete'])->name('id.cards.delete');
+
+// ID Card Report
+Route::get('id-cards/report',             [IdCardController::class, 'report'])->name('id.cards.report');
+Route::post('id-cards/ajax-with',         [IdCardController::class, 'ajaxWithIdCard'])->name('id.cards.ajaxWith');
+
+// ID Card Template
+Route::get('id-card-template',            [IdCardController::class, 'templateIndex'])->name('id.card.template.index');
+Route::get('id-card-template/edit/{id}',  [IdCardController::class, 'templateEdit'])->name('id.card.template.edit');
+Route::post('id-card-template/update/{id}',[IdCardController::class, 'templateUpdate'])->name('id.card.template.update');
+Route::post('id-card-template/toggle/{id}',[IdCardController::class, 'templateToggle'])->name('id.card.template.toggle');
+   Route::resource('site-settings',SiteSettingController::class);
     });
 });
 
@@ -321,9 +341,9 @@ Route::prefix('employee')->name('employee.')->group(function () {
         Route::prefix('product')->middleware(['permission:Product Master'])->group(function () {
             Route::get('/list', [ProductController::class, 'product_list'])->name('product.list');
             Route::get('/create', [ProductController::class, 'product_create'])->name('product.create');
-            Route::post('/store', [ProductController::class, 'product_store'])->name('product.store');         
+            Route::post('/store', [ProductController::class, 'product_store'])->name('product.store');
             Route::get('/edit/{id}', [ProductController::class, 'product_edit'])->name('product.edit');
-            Route::post('/update', [ProductController::class, 'product_update'])->name('product.update');      
+            Route::post('/update', [ProductController::class, 'product_update'])->name('product.update');
         });
 
         Route::prefix('inquiry')->middleware(['permission:Product Inquiry'])->group(function () {
